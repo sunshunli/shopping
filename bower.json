@@ -1,0 +1,22 @@
+{
+  "name": "shopping",
+  "authors": [
+    "sunshunli <sunshunli@hotmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "1.12.4",
+    "bootstrap": "^3.3.7",
+    "underscore": "^1.8.3"
+  }
+}
