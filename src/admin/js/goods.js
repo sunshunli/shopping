@@ -2,6 +2,7 @@
 
     var $dlg = $('#goodsDlg');
     var $delBtn = $('#delBtn');
+    var cache = {};
 
     //程序唯一入口
     var init = function(argument) {
@@ -13,6 +14,7 @@
         $('#newBtn').on('click', onNewBtnClick);
         $('#saveBtn').on('click', onSaveBtnClick);
         $('#delBtn').on('click', onDelBtnClick);
+        $('#updateBtn').on('click', onUpdateBtnClick);
         //绑定未来元素事件，产品checkbox绑定事件
         $('#goodsTable').on('click', 'tbody input[type=checkbox]', onChkBoxClick);
     };
@@ -49,13 +51,15 @@
                     '<td>', obj.classify, '</td>',
                     '</tr>'
                 );
+                cache[obj.id] = obj;
             });
 
             $('#goodsTable tbody').html(trArr.join(''));
-        }
+        };
         //添加新商品
     var onNewBtnClick = function() {
-        $dlg.modal({
+        $('#gForm').trigger('reset');
+        $dlg.find('#dlgTitle').text('新增商品').end().modal({
             keyboard: true
         });
     };
@@ -107,7 +111,25 @@
                     layer.msg('商品添加失败！', { offset: 't', anim: 0 });
                 }
             }, 'json');
-        }
+    };
+
+    //修改商品
+    var onUpdateBtnClick = function() {
+        var $chkbox = $('#goodsTable tbody input[type=checkbox]:checked');
+        var id = $chkbox[0].id;
+        var obj = cache[id];
+        console.log(obj.title);
+        $dlg.find('#title').val(obj.title);
+        $dlg.find('#price').val(obj.price);
+        $dlg.find('#details').val(obj.details);
+        $dlg.find('#amount').val(obj.amount);
+        $dlg.find('#classify').val(obj.classify);
+        //上架，下架状态
+        $dlg.find('input[name="status"][value="'+obj.status+'"]').trigger('click');
+        $dlg.find('#dlgTitle').text('修改商品').end().modal({
+            keyboard: true
+        });
+    }
         //删除商品
     var onDelBtnClick = function(argument) {
         var $chkbox = $('#goodsTable tbody input[type=checkbox]:checked');
@@ -138,13 +160,13 @@
                 }
             }, 'json');
         });
-
-
     };
     //复选框选中产品事件
     var onChkBoxClick = function() {
         var $inputs = $('#goodsTable tbody input[type=checkbox]');
         var $chkbox = $('#goodsTable tbody input[type=checkbox]:checked');
+        var $updateBtn = $('#updateBtn');
+        var len = $chkbox.length;
 
         //选中复选框后，本行高亮
         $inputs.each(function(i, obj) {
@@ -155,10 +177,15 @@
             }
         });
 
-        if ($chkbox.length > 0) {
+        if (len > 0) {
             $delBtn.removeAttr('disabled');
+            if (len == 1) {
+                $updateBtn.removeAttr('disabled');
+            } else {
+                $updateBtn.attr('disabled', 'disabled')
+            }
         } else {
-            $delBtn.attr('disabled', 'disabled');
+            $delBtn.add($updateBtn).attr('disabled', 'disabled');
         }
     };
 
