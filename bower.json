@@ -15,9 +15,9 @@
     "tests"
   ],
   "dependencies": {
-    "jquery": "1.12.4",
     "bootstrap": "^3.3.7",
     "underscore": "^1.8.3",
-    "layer": "^3.0.2"
+    "layer": "^3.0.2",
+    "jQuery": "^3.1.1"
   }
 }
