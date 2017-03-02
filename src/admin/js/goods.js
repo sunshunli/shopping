@@ -2,7 +2,12 @@
 
     var $dlg = $('#goodsDlg');
     var $delBtn = $('#delBtn');
-    var cache = {};
+    var cache = {}; //修改商品，获取数据时，将对象按id存放
+    var param = {    //搜索传参
+        query: '',
+        size: 3,
+        page: 0
+    };
 
     //程序唯一入口
     var init = function(argument) {
@@ -15,25 +20,28 @@
         $('#saveBtn').on('click', onSaveBtnClick);
         $('#delBtn').on('click', onDelBtnClick);
         $('#updateBtn').on('click', onUpdateBtnClick);
+        $('#searchBtn').on('click', onSearchBtnClick);
         //绑定未来元素事件，产品checkbox绑定事件
         $('#goodsTable').on('click', 'tbody input[type=checkbox]', onChkBoxClick);
+        $('#pageUl').on('click', 'li', onPageLiClick);
     };
-
     //从后台获取数据
-    var getTableData = function(argument) {
+    var getTableData = function() {
             var url = '../../../api/shopping_goods_list.php';
             //弹出遮罩层
             var loadingMsg = layer.msg('正在加载，请稍等...', { shade: [0.3, '#000'] });
-            $.get(url, function(response) {
+            $.get(url, param, function(response) {
                 if (response.success) {
                     //渲染表格
                     renderTable(response);
+                    //渲染分页项
+                    renderPaging(response);
                     //关闭遮罩层
                     layer.close(loadingMsg);
                 }
             }, 'json');
         }
-        //渲染表格
+    //渲染表格
     var renderTable = function(response) {
             //获得数据数组
             var data = response.data,
@@ -56,7 +64,7 @@
 
             $('#goodsTable tbody').html(trArr.join(''));
         };
-        //添加新商品
+    //添加新商品
     var onNewBtnClick = function() {
         $('#gForm').trigger('reset');
         $dlg
@@ -122,7 +130,6 @@
                 }
             }, 'json');
     };
-
     //修改商品
     var onUpdateBtnClick = function() {
         var $chkbox = $('#goodsTable tbody input[type=checkbox]:checked');
@@ -140,8 +147,8 @@
         $dlg.find('#dlgTitle').text('修改商品').end().modal({
             keyboard: true
         });
-    }
-        //删除商品
+    };
+    //删除商品
     var onDelBtnClick = function(argument) {
         var $chkbox = $('#goodsTable tbody input[type=checkbox]:checked');
         var tempArr = [];
@@ -198,6 +205,48 @@
         } else {
             $delBtn.add($updateBtn).attr('disabled', 'disabled');
         }
+    };
+    //搜索
+    var onSearchBtnClick = function() {
+        var $searchIpt = $('#searchIpt'),
+            txt = $searchIpt.val();
+        param.query = txt;
+        getTableData();
+    };
+    //分页
+    var renderPaging =function(response) {
+        var $pageUl = $('#pageUl'),
+            total = response.total,
+            pages = Math.ceil(total/param.size),
+            tempArr = ['<li class="prev"><a href="javascript:;">&laquo;</a></li>'];
+
+        param.totalPages = pages;
+
+        for (var i = 0; i < pages; i++) {
+            if (param.page == i) {
+                tempArr.push('<li data-pageid="', i, '" class="active"><a href="javascript:;">', i + 1, '</a></li>');
+            } else {
+                tempArr.push('<li data-pageid="', i, '"><a href="javascript:;">', i + 1, '</a></li>');
+            }
+        }
+        tempArr.push('<li class="next"><a href="javascript:;">&raquo;</a></li>');
+        $pageUl.html(tempArr.join(''));
+
+    };
+
+    var onPageLiClick = function() {
+        var $this = $(this);
+        var pageLiID = $this.attr('data-pageid');
+
+        if ($this.hasClass('next')) { //下一页
+            pageLiID = ++param.page;
+            pageLiID = pageLiID > param.totalPages - 1 ? param.totalPages - 1 : pageLiID;
+        } else if ($this.hasClass('prev')) { //上一页
+            pageLiID = --param.page;
+            pageLiID = pageLiID < 0 ? 0 : pageLiID;
+        }
+        param.page = pageLiID;
+        getTableData();
     };
 
     $(document).ready(init);
