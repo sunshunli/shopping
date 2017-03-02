@@ -59,13 +59,16 @@
         //添加新商品
     var onNewBtnClick = function() {
         $('#gForm').trigger('reset');
-        $dlg.find('#dlgTitle').text('新增商品').end().modal({
+        $dlg
+        .find('#gid').val('0').end()
+        .find('#dlgTitle').text('新增商品').end().modal({
             keyboard: true
         });
     };
     //保存新增商品
     var onSaveBtnClick = function() {
             var url = '../../../api/shopping_goods_add.php';
+            var gid = $('#gid').val();
             var data = {
                 title: $('#title').val(),
                 price: $('#price').val(),
@@ -74,6 +77,13 @@
                 classify: $('#classify').val(),
                 status: $('input[name=status]:checked').val()
             }
+            //通过给表单添加一个hidden的input元素，在点击修改商品时添加value属性为当前选中商品id
+            //这里判断如果id有值，保存按钮为修改，如果id为0，则为添加新商品
+            if (gid != 0) {
+                url = '../../..//api/shopping_goods_update.php';
+                data.id = gid;
+            }
+
 
             // 表单验证
             if (data.title == '') {
@@ -118,7 +128,8 @@
         var $chkbox = $('#goodsTable tbody input[type=checkbox]:checked');
         var id = $chkbox[0].id;
         var obj = cache[id];
-        console.log(obj.title);
+
+        $dlg.find('#gid').val(id);
         $dlg.find('#title').val(obj.title);
         $dlg.find('#price').val(obj.price);
         $dlg.find('#details').val(obj.details);

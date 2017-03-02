@@ -4,7 +4,7 @@
     $host = $_SERVER['HTTP_HOST'];
 
     /*测试环境*/
-    if (strpos($host, 'www.shopping.com') > -1) {
+    if (strpos($host, 'www.webserver.com') > -1) {
         $param = Array (
             'host' => 'localhost',
             'username' => 'root',
