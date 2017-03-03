@@ -31,7 +31,7 @@ $classify = $db -> rawQuery($sql);
 $classify_count = $db -> rawQuery($sql2);
 $total = $classify_count[0]['count'];
 
-//sleep(2);
+// sleep(10);
 
 if ($classify) {
 	echo json_encode(Array("success" => true, "total" => $total, "data" => $classify, "message" => "请求成功"));
